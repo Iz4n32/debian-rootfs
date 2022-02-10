@@ -5,9 +5,9 @@ if [[ ! $check_and_set ]]; then
     . 0-check-and-set.sh $1 $2
 fi
 
-# Get current UTC time
-utc_time=`date -u -d"$(wget -qO- --save-headers http://www.debian.org |\
-            sed '/^Date: /!d;s///;q')" +%Y%m%dT%H%M%SZ`
+# Get current UTC time from localhost
+utc_time=`date +%Y%m%dT%H%M%SZ`
+
 rootfs_dir_utc=$rootfs_dir-$utc_time
 
 # Cleanup when interrupt signal is received
