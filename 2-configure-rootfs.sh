@@ -9,6 +9,17 @@ fi
 filename=$build_dir/$rootfs_dir/etc/hostname
 echo $arch > $filename
 
+# MODIF: Set /etc/inittab
+filename=$build_dir/$rootfs_dir/etc/inittab
+if [[ -f $filename ]]; then
+	sed -i 's+id:[0-9]:initdefault:+id:3:initdefault:+g' $filename
+	sed -i 's/1:2345:respawn:\/sbin\/getty\ 38400\ tty1/#1:2345:respawn:\/sbin\/getty\ 38400\ tty1/g' $filename
+
+	if ! grep -Fxq "T1:23:respawn:/sbin/getty -L ttyPSC0 115200 xterm" $filename; then
+		printf 'T1:23:respawn:/sbin/getty -L ttyPSC0 115200 xterm\n' >> $filename;
+	fi
+fi
+
 # DNS.WATCH servers
 filename=$build_dir/$rootfs_dir/etc/resolv.conf
 echo "# DNS.WATCH servers" > $filename
