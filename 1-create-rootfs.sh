@@ -73,10 +73,16 @@ else
 	set_chroot
 fi
 
+# Apt upgrade
+printf "\n[INFO] apt-get upgrade:\n"
+chroot $build_dir/$rootfs_dir_utc apt-get update
+chroot $build_dir/$rootfs_dir_utc apt-get -y upgrade
+
 # Empty root password
 #chroot $build_dir/$rootfs_dir_utc passwd -d root
 
 # Set root password
+printf "\n[INFO] SET root PASS:\n"
 while [ true ]; do
 	chroot $build_dir/$rootfs_dir_utc passwd root
 	[ "$?" -eq "0" ] && break
