@@ -74,7 +74,13 @@ else
 fi
 
 # Empty root password
-chroot $build_dir/$rootfs_dir_utc passwd -d root
+#chroot $build_dir/$rootfs_dir_utc passwd -d root
+
+# Set root password
+while [ true ]; do
+	chroot $build_dir/$rootfs_dir_utc passwd root
+	[ "$?" -eq "0" ] && break
+done
 
 # Get packages installed
 chroot $build_dir/$rootfs_dir_utc dpkg -l | awk '{if (NR>3) {print $2" "$3}}' > $build_dir/$rootfs_dir_utc\-packages
