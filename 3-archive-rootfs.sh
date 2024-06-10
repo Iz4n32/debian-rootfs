@@ -15,5 +15,5 @@ tar cfz ../$tar_name *
 cd - >/dev/null
 
 echo
-echo "$(du -h build/armhf/rootfs.tar.gz) created"
+echo "$(du -h $build_dir/$tar_name) created"
 
