@@ -83,7 +83,7 @@ if [[ $arch != $host_arch ]]; then
         print_archs
         $exit_or_return 1
     fi
-    
+
     # Find qemu binary
     qemu_path=`which ${qemu_static[$arch]}`
 fi
