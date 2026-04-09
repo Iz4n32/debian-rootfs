@@ -1,6 +1,6 @@
 #!/bin/bash
 
-build_packages=( multistrap binfmt-support qemu-user-static )
+build_packages=( multistrap binfmt-support qemu-user-static psmisc apt-transport-https)
 sshd_packages=( ssh openssh-server )
 conf_default=multistrap.conf
 conf_powerpcspe=multistrap_debian-ports.conf
@@ -98,7 +98,7 @@ if [[ $arch != $host_arch ]]; then
         print_archs
         $exit_or_return 1
     fi
-    
+
     # Find qemu binary
     qemu_path=`which ${qemu_static[$arch]}`
 
