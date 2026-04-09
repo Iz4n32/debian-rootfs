@@ -2,22 +2,21 @@
 
 
 set_chroot () {
-
 	# Copy qemu binary to rootfs
 	cp $qemu_path $build_dir/$rootfs_dir_utc$qemu_path
 
 	# Mount /dev in rootfs
 	mount --bind /dev $build_dir/$rootfs_dir_utc/dev
 
-	# Complete the configure of dash
-	chroot $build_dir/$rootfs_dir_utc /var/lib/dpkg/info/dash.preinst install
-
-	# Configure debian packages
-	chroot $build_dir/$rootfs_dir_utc dpkg --configure -a
+	# Create policy-rc.d in rootfs
+	cat << 'EOF' > $build_dir/$rootfs_dir_utc/usr/sbin/policy-rc.d
+#!/bin/sh
+exit 101
+EOF
+	chmod +x $build_dir/$rootfs_dir_utc/usr/sbin/policy-rc.d
 }
 
 unset_chroot () {
-
 	# Kill processes running in rootfs
 	fuser -sk $build_dir/$rootfs_dir_utc
 
@@ -26,8 +25,17 @@ unset_chroot () {
 
 	# Umount /dev in rootfs
 	umount $build_dir/$rootfs_dir_utc/dev
+
+	# Remove policy-rc.d in rootfs
+	rm -rf $build_dir/$rootfs_dir_utc/usr/sbin/policy-rc.d
 }
 
+install_pkt () {
+	echo "$(tput setab 7)chroot: Installing $1$(tput sgr 0)"
+	cp files/deb_packages/$1 $build_dir/$rootfs_dir_utc/
+	chroot $build_dir/$rootfs_dir_utc dpkg $2 -i /$1
+	chroot $build_dir/$rootfs_dir_utc rm /$1
+}
 
 # Check architecture and set variables
 if [[ ! $check_and_set ]]; then
@@ -70,7 +78,13 @@ else
     export DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true
     export LC_ALL=C LANGUAGE=C LANG=C
 
-	set_chroot
+    set_chroot
+
+    # Complete the configure of dash
+    chroot $build_dir/$rootfs_dir_utc /var/lib/dpkg/info/dash.preinst install
+
+    # Configure debian packages
+    chroot $build_dir/$rootfs_dir_utc dpkg --configure -a
 fi
 
 # Apt upgrade
@@ -78,15 +92,16 @@ printf "\n[INFO] apt-get upgrade:\n"
 chroot $build_dir/$rootfs_dir_utc apt-get update
 chroot $build_dir/$rootfs_dir_utc apt-get -y upgrade
 
-# Empty root password
-#chroot $build_dir/$rootfs_dir_utc passwd -d root
 
-# Set root password
-printf "\n[INFO] SET root PASS:\n"
-while [ true ]; do
+# Change root password (loop until success)
+echo "$(tput setab 7)Set root password:$(tput sgr 0)"
+chroot $build_dir/$rootfs_dir_utc passwd root
+while [ $? -ne 0 ]; do
 	chroot $build_dir/$rootfs_dir_utc passwd root
-	[ "$?" -eq "0" ] && break
 done
+
+# Clean apt cache
+chroot $build_dir/$rootfs_dir_utc apt-get clean
 
 # Get packages installed
 chroot $build_dir/$rootfs_dir_utc dpkg -l | awk '{if (NR>3) {print $2" "$3}}' > $build_dir/$rootfs_dir_utc\-packages
