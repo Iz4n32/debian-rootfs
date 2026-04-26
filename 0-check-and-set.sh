@@ -1,6 +1,13 @@
 #!/bin/bash
 
-build_packages=( multistrap binfmt-support qemu-user-static psmisc apt-transport-https)
+build_packages=( multistrap binfmt-support psmisc apt-transport-https)
+
+if grep -q 'PRETTY_NAME="Ubuntu 26' /etc/os-release; then
+    build_packages+=( qemu-user-binfmt)
+else
+    build_packages+=( qemu-user-static)
+fi
+
 sshd_packages=( ssh openssh-server )
 conf_default=multistrap.conf
 conf_powerpcspe=multistrap_debian-ports.conf
