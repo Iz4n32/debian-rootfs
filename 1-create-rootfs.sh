@@ -83,6 +83,9 @@ else
     # Complete the configure of dash
     chroot $build_dir/$rootfs_dir_utc /var/lib/dpkg/info/dash.preinst install
 
+    # /var/lib/dpkg/status -> rm line with "remove-on-upgrade" before dpkg configure
+    chroot $build_dir/$rootfs_dir_utc sed -i '/remove-on-upgrade/d' /var/lib/dpkg/status
+
     # Configure debian packages
     chroot $build_dir/$rootfs_dir_utc dpkg --configure -a
 fi
