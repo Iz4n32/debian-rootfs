@@ -8,11 +8,13 @@ set_chroot () {
 	# Mount /dev in rootfs
 	mount --bind /dev $build_dir/$rootfs_dir_utc/dev
 
+: <<'END'
 	# Create policy-rc.d in rootfs
 	cat << 'EOF' > $build_dir/$rootfs_dir_utc/usr/sbin/policy-rc.d
 #!/bin/sh
 exit 101
 EOF
+END
 	chmod +x $build_dir/$rootfs_dir_utc/usr/sbin/policy-rc.d
 }
 
@@ -25,9 +27,11 @@ unset_chroot () {
 
 	# Umount /dev in rootfs
 	umount $build_dir/$rootfs_dir_utc/dev
-
+	
+: <<'END'
 	# Remove policy-rc.d in rootfs
 	rm -rf $build_dir/$rootfs_dir_utc/usr/sbin/policy-rc.d
+END
 }
 
 install_pkt () {
