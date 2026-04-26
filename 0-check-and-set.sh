@@ -3,7 +3,7 @@
 build_packages=( multistrap binfmt-support psmisc apt-transport-https)
 
 if grep -q 'PRETTY_NAME="Ubuntu 26' /etc/os-release; then
-    build_packages+=( qemu-user-binfmt)
+    build_packages+=( qemu-user-binfmt libconfig-auto-perl libparse-debian-packages-perl)
 else
     build_packages+=( qemu-user-static)
 fi
