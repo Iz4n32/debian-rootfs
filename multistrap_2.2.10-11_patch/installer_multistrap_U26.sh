@@ -6,5 +6,7 @@ wget https://archive.ubuntu.com/ubuntu/pool/universe/m/multistrap/multistrap_2.2
 
 sudo dpkg -i multistrap_2.2.11_all.deb || exit 1
 
+sudo cp multistrap /usr/sbin/multistrap
+
 exit 0
 
